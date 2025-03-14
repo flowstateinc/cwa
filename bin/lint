@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -euo pipefail
+IFS=$'\n\t'
+cd "${BASH_SOURCE%/*}/.."
+
+bbs() {
+  # As we don't have ripgrep on GitHub...
+  #
+  # rg '^#!/usr/bin/env bb' --files-with-matches --hidden
+  git grep \
+    --files-with-matches \
+    --recursive \
+    '^#!/usr/bin/env bb' \
+    ':!dev/**' ':!src/**' ':!test/**' || true
+}
+
+paths=(
+  dev
+  src
+  test
+  $(bbs)
+)
+
+clj-kondo --parallel --fail-level warning --lint ${paths[@]}
+cljfmt check ${paths[@]}

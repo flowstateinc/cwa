@@ -1,0 +1,6 @@
+#!/usr/bin/env zsh
+set -e
+cd "${0:h}/.."
+
+pnpm install
+exec pnpm watch

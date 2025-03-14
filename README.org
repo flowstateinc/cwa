@@ -1,0 +1,130 @@
+#+title: Clojure Web App
+
+Building web applications with Clojure can be productive and fun, assuming
+you're familiar with the underlying protocols and technologies of the web.
+
+#+begin_src sh :results output verbatim :exports both :wrap src html
+curl http://localhost:3000/ | htmlq h1
+#+end_src
+
+#+results:
+#+begin_src html
+<h1 class="mt-2 text-4xl font-semibold tracking-tight text-gray-900 sm:text-6xl">Coming soon!</h1>
+#+end_src
+
+* What's in the box?
+We have a collection of bin scripts to package up common tasks:
+
+- =bin/create-migration=: Create =up= and =down= files for SQL-based schema migrations
+- =bin/lint=: Spot issues and critique style according to subjective sensibilities
+- =bin/nrepl=: Start an nREPL server (best invoked via =devenv=)
+- =bin/tailwind=: Run a Tailwind process to watch for use of TailwindCSS classes
+- =bin/test=: Run tests (assuming PostgreSQL is available)
+
+#+begin_src sh :results output verbatim :exports results
+tree -I node_modules
+#+end_src
+
+#+results:
+#+begin_example
+.
+├── README.org
+├── bin
+│   ├── create-migration
+│   ├── lint
+│   ├── nrepl
+│   ├── tailwind
+│   └── test
+├── deps.edn
+├── dev
+│   ├── user.clj
+│   └── web
+│       ├── db.clj
+│       ├── dev.clj
+│       └── nrepl.clj
+├── dev-resources
+│   └── logback.xml
+├── devenv.lock
+├── devenv.nix
+├── devenv.yaml
+├── docker
+│   ├── Dockerfile.postgres
+│   └── init.sql
+├── docker-compose.yml
+├── package.json
+├── pnpm-lock.yaml
+├── resources
+│   ├── migrations
+│   │   ├── 20250314165829-create-schema.down.sql
+│   │   └── 20250314165829-create-schema.up.sql
+│   └── public
+│       ├── android-chrome-192x192.png
+│       ├── android-chrome-512x512.png
+│       ├── app.css
+│       ├── app.js
+│       ├── apple-touch-icon.png
+│       ├── favicon-16x16.png
+│       ├── favicon-32x32.png
+│       ├── favicon.ico
+│       └── js
+│           ├── htmx-ext-preload@2.1.0.js
+│           └── htmx@2.0.3.min.js
+├── src
+│   └── web
+│       ├── assets.clj
+│       ├── concierge.clj
+│       ├── config.clj
+│       ├── interceptors.clj
+│       ├── page.clj
+│       ├── postgres
+│       │   ├── employment.clj
+│       │   ├── group.clj
+│       │   ├── organization.clj
+│       │   ├── user.clj
+│       │   └── verified_domain.clj
+│       ├── postgres.clj
+│       ├── router.clj
+│       ├── service
+│       │   ├── manifest.clj
+│       │   └── root.clj
+│       ├── service.clj
+│       ├── spec.clj
+│       ├── string.clj
+│       ├── system.clj
+│       └── ui.clj
+├── styles
+│   └── tailwind.css
+├── tailwind.config.cjs
+├── test
+│   └── web
+│       ├── postgres_test.clj
+│       ├── service_test.clj
+│       └── test
+│           ├── hooks.clj
+│           ├── html.clj
+│           ├── service.clj
+│           └── system.clj
+└── tests.edn
+
+18 directories, 60 files
+#+end_example
+
+* Development
+** With Nix and =devenv=
+The easiest way to start a development environment is via Nix and devenv:
+
+#+begin_src sh :eval never
+devenv up
+#+end_src
+
+** With Docker et al
+Start PostgreSQL as per your preference and provide a database URL to the nREPL
+server process like so:
+
+#+begin_src sh :eval never
+DATABASE_URL='jdbc:postgresql://127.0.0.1:5432/web_dev?user=web&password=please' \
+  bin/nrepl
+#+end_src
+
+For convenience, we provide a Docker Compose file that will run PostgreSQL
+locally for those who prefer containers.

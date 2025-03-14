@@ -1,0 +1,6 @@
+{:auto-add-ns-to-new-files? false
+ :copy-kondo-configs?       true
+ :diagnostics               {:range-type :simple}
+ :hover                     {:arity-on-same-line? true
+                             :clojuredocs         true
+                             :hide-file-location? true}}

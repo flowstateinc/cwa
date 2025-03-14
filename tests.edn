@@ -1,0 +1,9 @@
+#kaocha/v1
+ {:plugins  [:kaocha.plugin/hooks
+             :kaocha.plugin/profiling
+             :kaocha.plugin/randomize]
+
+  :reporter kaocha.report.progress/report
+
+  :tests    [{:id                  :unit
+              :kaocha.hooks/before [web.test.hooks/pre-suite]}]}

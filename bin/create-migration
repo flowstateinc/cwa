@@ -1,0 +1,29 @@
+#!/usr/bin/env bb
+;; -*- mode: clojure -*-
+^{:clj-kondo/ignore [:namespace-name-mismatch]}
+(ns create-migration
+  (:require
+   [babashka.fs :as fs]
+   [clojure.string :as str])
+  (:import
+   (java.time LocalDateTime)
+   (java.time.format DateTimeFormatter)))
+
+(def timestamp
+  (.format (LocalDateTime/now) (DateTimeFormatter/ofPattern "yyyyMMddHHmmss")))
+
+(defn paths
+  [timestamp migration-name]
+  (for [direction #{"down" "up"}]
+    (format "resources/migrations/%s-%s.%s.sql" timestamp migration-name direction)))
+
+(let [migration-name (first *command-line-args*)]
+  (if (str/blank? migration-name)
+    (do
+      (binding [*out* *err*] (println "Usage: create-migration <migration-name>"))
+      (System/exit 1))
+    (do
+      (fs/create-dirs "resources/migrations")
+      (doseq [path (paths timestamp migration-name)]
+        (println path)
+        (spit path "")))))

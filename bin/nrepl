@@ -1,0 +1,24 @@
+#!/usr/bin/env zsh
+set -e
+cd "${0:h}/.."
+
+bold=$(tput bold)
+red=$(tput setaf 1)
+blue=$(tput setaf 4)
+reset=$(tput sgr0)
+
+if [[ -n "$WEB_IN_NIX" ]]; then
+  echo >&2 \
+    -e "${bold}${red}==>${reset} Running bin/nrepl outside of a Nix dev shell" \
+    "may cause problems. Bon voyage!"
+fi
+
+echo >&2 \
+  -e "${bold}${blue}==>${reset} Starting nREPL server..."
+
+exec clojure \
+  -M:dev:test:logging:nrepl \
+  --report stderr \
+  --main web.nrepl \
+  --host localhost \
+  --port 9191

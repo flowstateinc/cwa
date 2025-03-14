@@ -1,0 +1,13 @@
+{
+  "private": true,
+  "scripts": {
+    "build": "tailwindcss --input styles/tailwind.css --output resources/public/app.css --minify",
+    "watch": "tailwindcss --watch --input styles/tailwind.css --output resources/public/app.css"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.0.9",
+    "@tailwindcss/language-server": "^0.14.8",
+    "tailwindcss": "^4.0.9",
+    "vscode-css-languageservice": "^6.3.2"
+  }
+}

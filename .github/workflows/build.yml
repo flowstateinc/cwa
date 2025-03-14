@@ -1,0 +1,109 @@
+name: Build
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request_target' && github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  merge_group:
+  pull_request:
+    paths-ignore:
+      - "**/*.org"
+
+jobs:
+  test:
+    runs-on: namespace-profile-default
+
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_DB: web_test
+          POSTGRES_USER: web
+          POSTGRES_PASSWORD: please
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4.6.0
+        with:
+          distribution: "temurin"
+          java-version: "21"
+
+      - name: Setup Clojure
+        # https://github.com/flowstateinc/setup-clojure/commit/ada62bb3282a01a296659d48378b812b8e097360
+        uses: flowstateinc/setup-clojure@ada62bb3282a01a296659d48378b812b8e097360
+        with:
+          cli: latest
+          bb: latest
+
+      - name: Cache Clojure dependencies
+        uses: actions/cache@v4.2.0
+        with:
+          path: |
+            ~/.babashka/pods
+            ~/.deps.clj
+            ~/.gitlibs
+            ~/.local/share/.babashka/pods
+            ~/.m2/repository
+          key: ${{ runner.os }}-clojure-test-${{ hashFiles('bb.edn', 'deps.edn') }}
+          restore-keys: |
+            ${{ runner.os }}-clojure-test-
+
+      - name: Run tests
+        run: bin/test --config-file tests-ci.edn
+        env:
+          DATABASE_URL: "jdbc:postgresql://127.0.0.1:5432/web_test?user=web&password=please"
+
+      - name: Publish test report
+        if: success() || failure()
+        uses: mikepenz/action-junit-report@3eb73721b6d71f5d48b93839d0b534bfba8f4eaf
+        with:
+          check_name: Clojure test report
+          report_paths: junit.xml
+
+  lint:
+    runs-on: namespace-profile-default
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4.6.0
+        with:
+          distribution: "temurin"
+          java-version: "21"
+
+      - name: Setup Clojure
+        # https://github.com/flowstateinc/setup-clojure/commit/ada62bb3282a01a296659d48378b812b8e097360
+        uses: flowstateinc/setup-clojure@ada62bb3282a01a296659d48378b812b8e097360
+        with:
+          clj-kondo: latest
+          cljfmt: latest
+
+      - name: Cache Clojure dependencies
+        uses: actions/cache@v4.2.0
+        with:
+          path: |
+            ~/.babashka/pods
+            ~/.m2/repository
+          key: ${{ runner.os }}-clojure-lint-${{ hashFiles('deps.edn') }}
+          restore-keys: |
+            ${{ runner.os }}-clojure-lint-
+
+      - name: Lint
+        run: bin/lint

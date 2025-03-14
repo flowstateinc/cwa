@@ -1,0 +1,19 @@
+{:lint-as
+ {clojure.test.check.clojure-test/defspec clojure.test/deftest
+  clojure.test.check.properties/for-all   clojure.core/let
+  web.test.system/with-system             clojure.core/let}
+
+ :linters
+ {:consistent-alias
+  {:aliases {clojure.spec.alpha s
+             web.interceptor    i
+             web.test.service   t}}
+
+  :unused-referred-var
+  {:exclude {com.stuartsierra.component.repl [system]}}
+
+  :unresolved-symbol
+  {:exclude [(clojure.test/is [match?])]}
+
+  :unresolved-var
+  {:exclude [next.jdbc.types/as-other]}}}

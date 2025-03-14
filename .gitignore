@@ -1,0 +1,14 @@
+*.class
+*.jar
+/.clj-kondo/.cache/
+/.cpcache/
+/.devenv.flake.nix
+/.lsp/.cache
+/.nrepl-history
+/.nrepl-port
+/classes/
+/node_modules/
+/resources/public/app.css
+/target/
+pom.xml
+pom.xml.asc
