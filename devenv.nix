@@ -14,6 +14,7 @@
     git
     htmlq
     nodePackages.prettier
+    plantuml
 
     # Infrastructure
     docker

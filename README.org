@@ -128,3 +128,71 @@ DATABASE_URL='jdbc:postgresql://127.0.0.1:5432/web_dev?user=web&password=please'
 
 For convenience, we provide a Docker Compose file that will run PostgreSQL
 locally for those who prefer containers.
+
+* Coding task
+As part of our customer activation process, we need to insert new organizations
+and their members into our PostgreSQL database.
+
+The suggested format for representing organizations looks like this:
+
+#+begin_src clojure
+{"flowstate.inc"
+ {:web.postgres.organization/name             "flowstate"
+  :web.postgres.organization/verified-domains #{"flowstate.inc"}
+  :web.postgres.organization/members          #{{:web.postgres.user/email     "user-0@flowstate.inc"}
+                                                {:web.postgres.user/email     "user-1@flowstate.inc"}
+                                                {:web.postgres.user/email     "user-2@flowstate.inc"}}}
+
+ "example.com"
+ {:web.postgres.organization/name             "Example"
+  :web.postgres.organization/verified-domains #{"example.com" "example.dev"}
+  :web.postgres.organization/members          #{{:web.postgres.user/email     "user-0@example.com"}
+                                                {:web.postgres.user/email     "user-1@example.com"}
+                                                {:web.postgres.user/email     "user-2@example.dev"}}}}
+#+end_src
+
+The following events are likely to occur in future and we need to support them:
+
+1. We will add new organizations
+2. We need to be able to add and remove verified domains
+3. We will add new members to organizations
+4. We may remove organizations members
+5. It's possible a user's email address might change
+
+Please do not worry about validation of the data. Assume it is well-formed and
+without error (e.g. users will always have email addresses).
+
+You can use an alternate representation, include additional information and
+replace any names as you see fit (hint: adding additional information will
+greatly simplify the task).
+
+The following relationships exist within the database:
+
+- Organizations have zero or more verified domains
+- Organizations have many employments
+- Users have many organizations through their employments
+- Users have many groups through their group memberships
+- Groups belong to an organization
+
+Organizations and their members will not exist prior to the first invocation of
+your activation process.
+
+Some considerations to keep in mind:
+
+- The process of activating organizations must be idempotent.
+- The existing =web.concierge= namespace is a good place to add your activation
+  logic.
+- You can make changes to the database and have full control over all of the
+  data within it.
+- We must be careful to not lose any data that would negatively impact customer
+  experience or the flowstate brand.
+- We can be pragmatic with our approach and ask the supplier of this EDN file to
+  adhere to certain justifiable constraints.
+
+Any code we produce needs automated tests. Refactoring parts of the code base is
+fine as long as we're working towards delivering working software.
+
+We're interested in your approach to problem solving, how you think about
+crafting software, and how you make trade-offs where necessary. You can use
+language models, search engines, your preferred editor and operating system. We
+only ask that you pair with us on solving the problem with Clojure.
